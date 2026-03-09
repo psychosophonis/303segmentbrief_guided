@@ -152,7 +152,7 @@
     color: var(--dim);
     white-space: nowrap;
   }
-  .meta-field input {
+  .meta-field input, .meta-field select {
     flex: 1;
     border: none;
     border-bottom: 1.5px solid var(--rule);
@@ -164,6 +164,9 @@
     padding: 4px 0;
     outline: none;
     transition: border-color 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
   }
   .meta-field input:focus { border-bottom-color: var(--ink); }
 
@@ -1224,26 +1227,9 @@
 </header>
 
 <div class="exp-bar">
-  <button class="exp-tab active" data-exp="0" onclick="switchExp(0)">
-    Experiment 1
-    <span class="exp-mode" id="expMode0">—</span>
-  </button>
-  <button class="exp-tab" data-exp="1" onclick="switchExp(1)">
-    Experiment 2
-    <span class="exp-mode" id="expMode1">—</span>
-  </button>
-  <button class="exp-tab" data-exp="2" onclick="switchExp(2)">
-    Experiment 3
-    <span class="exp-mode" id="expMode2">—</span>
-  </button>
-  <button class="exp-tab example-tab" data-exp="3" onclick="switchExp(3)">
-    Example
-    <span class="exp-mode" id="expMode3">Platform</span>
-  </button>
-  <div class="exp-bar-spacer"></div>
-  <button id="btnGuided" class="btn-print btn-print-blank" onclick="enterGuided()">Guide me →</button>
-  <button class="btn-print btn-print-blank" onclick="printBlankForm()">Print blank form</button>
-  <button class="btn-print" onclick="window.print()">Print / PDF</button>
+  <button id="btnGuided" class="exp-tab btn-print-blank" onclick="enterGuided()">Guide me →</button>
+  <button id="btnExample" class="exp-tab" onclick="showExampleView()">See example ↗</button>
+  <button id="btnHideExample" class="exp-tab active" onclick="hideExampleView()" style="display:none">← Back to my brief</button>
 </div>
 
 <div class="blank-form-header">
@@ -1257,16 +1243,33 @@
 <div class="meta-row">
   <div class="meta-field">
     <label>Group</label>
-    <input type="text" id="metaGroup" placeholder="your group name — type it here to load your data" oninput="saveField(this)">
+    <input type="text" id="metaGroup" placeholder="your group name" oninput="saveField(this)">
+  </div>
+  <div class="meta-field">
+    <label>Tutorial</label>
+    <select id="metaTutorial" onchange="saveField(this)">
+      <option value="">— select —</option>
+      <option value="Mon 9.30">Mon 9.30</option>
+      <option value="Mon 13.30">Mon 13.30</option>
+      <option value="Tue 9.30">Tue 9.30</option>
+      <option value="Tue 12.30">Tue 12.30</option>
+      <option value="Tue 14.30">Tue 14.30</option>
+    </select>
   </div>
   <div class="meta-field">
     <label>Mode</label>
-    <input type="text" id="metaMode" placeholder="Platform / Performance / Participation / Discourse" oninput="saveMeta(); updateModeTab()">
+    <select id="metaMode" onchange="saveMeta(); updateModeTab()">
+      <option value="">— select —</option>
+      <option value="Platform">Platform</option>
+      <option value="Performance">Performance</option>
+      <option value="Participation">Participation</option>
+      <option value="Discourse">Discourse</option>
+    </select>
     <button class="mode-btn" onclick="openModeModal()">Mode guide</button>
   </div>
   <div class="meta-field">
     <label>Week</label>
-    <input type="text" id="metaWeek" placeholder="3 / 5 / 7" oninput="saveMeta()">
+    <input type="text" id="metaWeek" placeholder="3 / 5 / 7" oninput="saveField(this)">
   </div>
 </div>
 
@@ -1303,7 +1306,6 @@
         </div>
       </div>
     </div>
-    <div class="instr-note">Each group's data is stored separately — multiple groups can use this site at the same time without affecting each other.</div>
     <button class="instr-dismiss" onclick="dismissInstr()">Got it — don't show this again</button>
   </div>
 </div>
@@ -1362,7 +1364,7 @@
 
   <!-- ═══ PART 1 ═══════════════════════════════════════════ -->
   <div class="example-banner" id="exampleBanner" style="display:none">
-    <strong>Example segment — read only.</strong> This shows a worked answer for a Platform segment. Use it to understand what the form is asking, then switch to Experiment 1 to start your own. <span style="opacity:0.7">The reference images below are placeholders for testing — in your own brief, use screenshots from actual broadcasts or footage.</span>
+    <strong>Example segment — read only.</strong> This shows a worked answer for a Platform segment. Use it to understand what the form is asking, then tap "Back to my brief" to start your own. <span style="opacity:0.7">The reference images below are placeholders for testing — in your own brief, use screenshots from actual broadcasts or footage.</span>
   </div>
 
   <div class="phase-banner p1">
@@ -1379,62 +1381,42 @@
     <div class="section-body">
       <div class="field">
         <label>One sentence: what happens in this segment, and why would someone outside this room care?</label>
-        <div class="hint">If you can't write this, you don't know what your segment is yet. That's the conversation to have now.</div>
         <textarea id="f_logline" rows="2" class="short" oninput="saveField(this)"></textarea>
       </div>
-      <div class="field">
-        <label>What has changed since your last version — or what is this for the first time?</label>
-        <textarea id="f_logline_delta" rows="2" class="short" oninput="saveField(this)"></textarea>
-      </div>
+
     </div>
   </div>
 
-  <!-- SEGMENT -->
+  <!-- AUTHORITY & STAKES & CHARTER -->
   <div class="section">
-    <div class="section-head"><h3>The Segment</h3></div>
+    <div class="section-head"><h3>Foundations</h3></div>
     <div class="section-body">
+      <p style="font-size:12px;color:var(--dim);font-style:italic;margin-bottom:14px;">These questions apply to every mode — comedy, satire, performance, interview. The best segments answer them well. You don't need to resolve all of them today, but you need to have started.</p>
       <div class="field">
-        <label>Beginning, middle, end — three sentences maximum</label>
-        <textarea id="f_segment" rows="3" oninput="saveField(this)"></textarea>
+        <label>Where does the authority to make this come from?</label>
+        <div class="hint">Lived experience, research, relationships, expertise, giving voice to someone else's perspective — all are valid grounds. What are yours? The best answers involve someone outside the room. If your authority is entirely internal, ask whether that's the most interesting version of this segment.</div>
+        <textarea id="f_authority" oninput="saveField(this)"></textarea>
       </div>
-      <div class="field">
-        <label>What are we genuinely trying to find out?</label>
-        <div class="hint">Not 'whether it works.' What specific question does this experiment need to answer?</div>
-        <textarea id="f_question" rows="2" class="short" oninput="saveField(this)"></textarea>
+      <div class="field" style="margin-top:10px">
+        <label>Who in this community needs this to exist — and why?</label>
+        <div class="hint">This is the ecological function question. If you can't name a specific person, practice, or gap this serves, the segment may not need to exist yet.</div>
+        <textarea id="f_purpose" class="short" oninput="saveField(this)"></textarea>
+      </div>
+      <div class="field" style="margin-top:10px">
+        <label>How does this respond to the Charter?</label>
+        <div class="hint">Does it draw on the creative and cultural life of this community — and how does it give something back? Whose voices, whose culture?</div>
+        <textarea id="f_charter" class="short" oninput="saveField(this)"></textarea>
+      </div>
+
+      <div class="field" style="margin-top:10px">
+        <label>Who would actually watch this — and why would they be engaged?</label>
+        <div class="hint">Name a specific audience, not a general one. What does this segment offer them that they couldn't get elsewhere?</div>
+        <textarea id="f_audience_p1" class="short" oninput="saveField(this)"></textarea>
       </div>
     </div>
   </div>
 
-  <!-- AUTHORITY -->
-  <div class="section">
-    <div class="section-head"><h3>Authority &amp; Relationship</h3></div>
-    <div class="section-body">
-      <p style="font-size:12px;color:var(--dim);font-style:italic;margin-bottom:14px;">Before you think about cameras, think about this. These questions are the ground the production stands on.</p>
-      <div class="two-col">
-        <div class="field">
-          <label>Where does the authority to make this come from?</label>
-          <div class="hint">Is it inside the group, or do you need to go somewhere else to find it?</div>
-          <textarea id="f_authority" oninput="saveField(this)"></textarea>
-        </div>
-        <div class="field">
-          <label>For someone, or about them?</label>
-          <div class="hint">Is there a real person or community outside this room who would recognise themselves in it? What's the difference in your case?</div>
-          <textarea id="f_forabout" oninput="saveField(this)"></textarea>
-        </div>
-        <div class="field">
-          <label>Who are you making this for?</label>
-          <textarea id="f_for" class="short" oninput="saveField(this)"></textarea>
-        </div>
-        <div class="field">
-          <label>What changes by the end?</label>
-          <div class="hint">For the subject, the audience, the room. What's actually at stake?</div>
-          <textarea id="f_stakes" class="short" oninput="saveField(this)"></textarea>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PLATFORM -->
+    <!-- PLATFORM -->
   <div class="section">
     <div class="section-head"><h3>Platform Mode<button class="tt-btn" onclick="toggleTip(this)" aria-label="What is Platform Mode?">?</button><span class="tt-pop">Platform means your segment gives a real person or community from outside the room a stage. The relationship with them is built before the studio — it's the work, not the setup.</span></h3></div>
     <div class="section-body">
@@ -1460,6 +1442,37 @@
     </div>
   </div>
 
+
+
+  <div class="notice" style="background:var(--phase1-light);border-left:3px solid var(--ink);margin-bottom:8px;">
+    <strong>Couch conversation →</strong>
+    <p>Talk through these four questions in your group first — then take the couch. One person hosts, the others speak from the brief. Don't read.</p>
+    <ol style="margin:6px 0 0 16px;font-size:12px;color:var(--mid);line-height:1.8;">
+      <li>What's the segment — what actually happens?</li>
+      <li>How does it meet the Charter?</li>
+      <li>Where did this come from — what's your group's real connection to it?</li>
+      <li>Who would watch this, and why would they be engaged?</li>
+    </ol>
+    <p style="margin-top:6px;">If the answers feel thin here, the brief isn't ready yet.</p>
+  </div>
+
+  <div class="notice">
+    <strong>Before you leave today →</strong>
+    <p>Post this brief to your Discord channel. Watch your couch conversation back. Note one thing you noticed that you couldn't see in the room.</p>
+  </div>
+
+  <!-- ═══ PART 2 ═══════════════════════════════════════════ -->
+  <hr class="part-divider page-break-before">
+
+  <div class="phase-banner p2">
+    <div class="phase-num">2</div>
+    <div class="phase-text">
+      <h2>Complete before the studio session</h2>
+      <p>Production planning. This is your brief to yourself and the crew you'll be directing.</p>
+    </div>
+  </div>
+
+  <!-- STAGING -->
   <!-- CREW -->
   <div class="section">
     <div class="section-head"><h3>Crew — provisional</h3></div>
@@ -1482,23 +1495,6 @@
     </div>
   </div>
 
-  <div class="notice">
-    <strong>Before you leave today →</strong>
-    <p>Post this brief to your Discord channel. Watch your pitch recording back. Note one thing you noticed that you couldn't see in the room.</p>
-  </div>
-
-  <!-- ═══ PART 2 ═══════════════════════════════════════════ -->
-  <hr class="part-divider page-break-before">
-
-  <div class="phase-banner p2">
-    <div class="phase-num">2</div>
-    <div class="phase-text">
-      <h2>Complete before the studio session</h2>
-      <p>Production planning. This is your brief to yourself and the crew you'll be directing.</p>
-    </div>
-  </div>
-
-  <!-- STAGING -->
   <div class="section">
     <div class="section-head"><h3>Set &amp; Staging</h3></div>
     <div class="section-body">
@@ -1671,12 +1667,11 @@
 
 <script>
 // ── STATE ─────────────────────────────────────────────────────
-let currentExp = 0;
 const NUM_REFS = 6;
 const FIELD_IDS = [
-  'metaGroup','metaMode','metaWeek',
-  'f_logline','f_logline_delta','f_segment','f_question',
-  'f_authority','f_forabout','f_for','f_stakes',
+  'metaGroup','metaTutorial','metaMode','metaWeek',
+  'f_logline',
+  'f_authority','f_purpose','f_charter','f_audience_p1',
   'f_collab_who','f_collab_brief','f_collab_confirmed',
   'crew_fd','crew_td','crew_c1','crew_c2','crew_c3','crew_audio','crew_other',
   'f_feel','f_props','f_positions','f_audience',
@@ -1710,8 +1705,8 @@ function groupNS() {
   return 'bcm303_' + name.toLowerCase().replace(/\s+/g, '_');
 }
 
-function key(expIdx, fieldId) {
-  return `${groupNS()}_exp${expIdx}_${fieldId}`;
+function key(fieldId) {
+  return `${groupNS()}_${fieldId}`;
 }
 
 function saveAll() {
@@ -1719,7 +1714,7 @@ function saveAll() {
     const el = document.getElementById(id);
     if (!el) return;
     const val = el.type === 'checkbox' ? el.checked : el.value;
-    localStorage.setItem(key(currentExp, id), val);
+    localStorage.setItem(key(id), val);
   });
   flashSaved();
 }
@@ -1727,11 +1722,10 @@ function saveAll() {
 function saveField(el) {
   const id = el.id;
   const val = el.type === 'checkbox' ? el.checked : el.value;
-  localStorage.setItem(key(currentExp, id), val);
+  localStorage.setItem(key(id), val);
   if (id === 'metaMode') updateModeTab();
-  // When group name changes, reload from the new namespace
   if (id === 'metaGroup') {
-    loadExp(currentExp);
+    loadExp();
     updateAllModeTabs();
   }
   flashSaved();
@@ -1739,70 +1733,47 @@ function saveField(el) {
 
 function saveMeta() {
   const m = document.getElementById('metaMode');
-  const w = document.getElementById('metaWeek');
-  if (m) localStorage.setItem(key(currentExp, 'metaMode'), m.value);
-  if (w) localStorage.setItem(key(currentExp, 'metaWeek'), w.value);
+  if (m) localStorage.setItem(key('metaMode'), m.value);
   updateModeTab();
   flashSaved();
 }
 
-function loadExp(expIdx) {
-  const groupEl = document.getElementById('metaGroup');
-  const currentGroup = groupEl ? groupEl.value : '';
+function loadExp() {
   FIELD_IDS.forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
-    // Don't overwrite the group field itself when loading
     if (id === 'metaGroup') return;
-    const val = localStorage.getItem(key(expIdx, id));
-    if (val === null || val === undefined) {
-      // Clear field when switching to empty namespace
-      if (el.type === 'checkbox') el.checked = false;
-      else el.value = '';
-      return;
-    }
+    const val = localStorage.getItem(key(id));
+    // Always write — clears example data if no saved value exists
     if (el.type === 'checkbox') el.checked = val === 'true';
-    else el.value = val;
+    else el.value = val || '';
   });
-  for (let i = 0; i < NUM_REFS; i++) {
-    const urlEl = document.getElementById(`ref_${i}_url`);
-    if (urlEl && urlEl.value) loadRefImage(i, urlEl.value);
-  }
   autoResizeAll();
 }
 
 // ── EXPERIMENT SWITCHER ───────────────────────────────────────
-function switchExp(idx) {
-  currentExp = idx;
-  document.querySelectorAll('.exp-tab').forEach((t, i) => {
-    t.classList.toggle('active', i === idx);
-  });
-  if (idx === IS_EXAMPLE) {
-    loadExampleExp();
-    updateAllModeTabs();
-  } else {
-    document.getElementById('exampleBanner').style.display = 'none';
-    setFieldsReadOnly(false);
-    loadExp(idx);
-    updateAllModeTabs();
-  }
+function showExampleView() {
+  loadExampleExp();
+  document.getElementById('exampleBanner').style.display = 'block';
+  setFieldsReadOnly(true);
+  document.getElementById('btnExample').style.display = 'none';
+  document.getElementById('btnHideExample').style.display = '';
+}
+function hideExampleView() {
+  document.getElementById('exampleBanner').style.display = 'none';
+  setFieldsReadOnly(false);
+  loadExp();
+  updateAllModeTabs();
+  document.getElementById('btnExample').style.display = '';
+  document.getElementById('btnHideExample').style.display = 'none';
 }
 
 function updateModeTab() {
-  const m = document.getElementById('metaMode');
-  if (!m) return;
-  const modeEl = document.getElementById(`expMode${currentExp}`);
-  if (modeEl) modeEl.textContent = m.value || '—';
+  // no-op: exp tabs removed
 }
 
 function updateAllModeTabs() {
-  for (let i = 0; i < 3; i++) {
-    const stored = i === currentExp
-      ? (document.getElementById('metaMode')?.value || '')
-      : (localStorage.getItem(key(i, 'metaMode')) || '');
-    const el = document.getElementById(`expMode${i}`);
-    if (el) el.textContent = stored || '—';
-  }
+  // no-op: exp tabs removed
 }
 
 // ── SAVE INDICATOR ────────────────────────────────────────────
@@ -1906,9 +1877,8 @@ function initInstrPanel() {
 
 
 // ── EXAMPLE DATA ──────────────────────────────────────────────
-const EXAMPLE_DATA = {"metaGroup": "Example Group", "metaMode": "Platform", "metaWeek": "3", "f_logline": "Dharawal hip-hop artist Mia Chen performs two songs and talks about making music that belongs to a specific place \u2014 for an audience of students who mostly consume music made somewhere else.", "f_logline_delta": "First time \u2014 this is our first experiment.", "f_segment": "Mia performs a short acoustic set (two songs), then sits with our host for a ten-minute conversation about the relationship between her music and Dharawal Country. The segment ends with a second performance of a track she explains during the conversation, heard differently now.", "f_question": "Does the conversation change how the second performance lands \u2014 does knowing more about the work change what the audience hears?", "f_authority": "Mia has been making music in the Wollongong scene for three years. Our group has been following her work and reached out directly. The authority is hers \u2014 we're providing the platform and the frame, not the content.", "f_forabout": "It's for Mia and for the local music community she's part of. We're not explaining her work to an outside audience \u2014 we're amplifying it to people in the same place who might not have found it yet.", "f_for": "Local young people in the Wollongong creative scene. Students in this room who are making things in the same place.", "f_stakes": "For Mia: her work gets heard by a new audience in the place it comes from. For the audience: they encounter a practice they share geography with. For the room: we find out whether the conversation changes the listening.", "f_collab_who": "Mia Chen \u2014 acoustic performer and songwriter, Wollongong. She's bringing her guitar and two original tracks.", "f_collab_brief": "Yes \u2014 briefed Tuesday. Mia knows: live stream to YouTube, 20 minutes total, acoustic performance plus conversation, we're not scripting the interview questions in advance, she can say no to anything.", "f_collab_confirmed": "true", "crew_fd": "Sam \u2014 briefs Mia before we go live, manages segment timing", "crew_td": "Jordan \u2014 on the switcher, we've agreed cut points in advance", "crew_c1": "Alex \u2014 wide shot covering full performance area", "crew_c2": "Priya \u2014 close on Mia during performance, two-shot during conversation", "crew_c3": "TBC from class \u2014 cutaways: hands on guitar, audience reactions", "crew_audio": "Lee \u2014 DI from guitar, lapel on Mia for conversation, check levels before live", "crew_other": "", "f_feel": "Intimate. Not a concert stage \u2014 a living room. We want the audience to feel like they've been let into a private performance, not watching from a distance.", "f_props": "Two stools. No backdrop \u2014 bare studio wall. A small rug under the performance area. Guitar stand. Water on a low table. Nothing decorative.", "f_positions": "Mia centred, slightly stage left. Host stage right on second stool. Stools angled 45\u00b0 toward each other, both visible to cameras. No desk between them \u2014 physical openness is deliberate.", "f_audience": "Studio audience semicircle behind camera line \u2014 present but not in frame except for Cam 3 reaction shots. Their energy is part of the atmosphere.", "cam1_pos": "Camera left, slightly elevated, wide. Covers full performance area and both stools.", "cam1_shots": "Wide establishing shot. Full two-shot during conversation. Default return shot between cuts.", "cam1_moments": "Opening of each song. Start of conversation. Closing performance.", "cam1_notes": "Hold on wide at song openings \u2014 let the space read before cutting in.", "cam2_pos": "Camera right, close. Tight on Mia.", "cam2_shots": "MCU on Mia during performance. Singles during conversation. Hands on guitar.", "cam2_moments": "Any moment Mia makes a specific lyrical or musical choice worth highlighting. Key statements in conversation.", "cam2_notes": "Stay on Mia during the second performance \u2014 we want the close read after the conversation.", "cam3_pos": "Camera left rear, handheld or on shoulder. Audience side.", "cam3_shots": "Audience reactions. Over-shoulder cutaways. Creative angles during performance.", "cam3_moments": "First song ending. Any strong audience response. Anything unexpected.", "cam3_notes": "Not called live \u2014 TD pulls from these as colour. Operator has freedom to find what's alive.", "f_switcher": "Default rhythm: wide on song openings, cut to Cam 2 for close work after first verse. Conversation: hold singles longer than feels comfortable \u2014 let statements land. Return to wide when energy drops.", "audio_0_src": "Guitar (acoustic)", "audio_0_mic": "DI box from guitar output + room mic for natural sound", "audio_0_notes": "Test DI level before session. Natural reverb preferred \u2014 don't over-process.", "audio_1_src": "Mia (voice \u2014 performance)", "audio_1_mic": "Condenser overhead for singing \u2014 not a clip mic", "audio_1_notes": "Position before session. Risk: feedback from monitors \u2014 check gain before live.", "audio_2_src": "Both speakers (conversation)", "audio_2_mic": "Lavalier mics clipped before going live", "audio_2_notes": "Switch from overhead to lavs between performance and conversation. Cue: host stands to introduce conversation segment.", "audio_3_src": "", "audio_3_mic": "", "audio_3_notes": "", "f_assets": "Title card (static graphic): loaded in Mitti, TD calls at segment open. Outro music bed (original track, WAV file): loaded in Mitti, operator fades in at segment close. Note: streaming services and commercial recordings are subject to copyright law — automated enforcement can mute or interrupt the stream.", "audio_4_src": "Intro/outro music", "audio_4_mic": "WAV file via Mitti → audio board", "audio_4_notes": "Original or cleared track only — streaming services and commercial recordings are subject to copyright law — automated enforcement can mute or interrupt the stream. Cue: floor director signals 10 sec before segment close. Fade in slowly — don't cut over speech.", "audio_5_src": "", "audio_5_mic": "", "audio_5_notes": "", "f_script_runorder": "1. TD cuts to Cam 1 wide — host introduces segment (scripted, 30 sec).\n2. Host introduces Mia — Mia begins Song 1.\n3. Song 1 (~3 min). Cam 2 on performance throughout.\n4. Host pivots to conversation stool. Audio: switch to lavs.\n5. Conversation (~10 min). Singles + two-shot.\n6. Host re-introduces second performance (improvised, ~30 sec).\n7. Song 2 (~3 min). Cam 2 holds on face after conversation.\n8. Host closes segment to camera (scripted). Audio operator fades in music bed (original/cleared track) via Mitti.", "ref_0_moment": "Opening wide \u2014 Mia alone before introduction", "ref_0_shot": "Cam 1, wide, static", "ref_0_url": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600", "ref_0_notes": "Decision: camera stays wide and static as performer enters — space reads before any cut. From NPR Tiny Desk: Robert Glasper, opening shot. Establishes the room as intimate, not a stage.", "ref_1_moment": "Performance \u2014 close on hands and guitar", "ref_1_shot": "Cam 2, ECU hands", "ref_1_url": "https://images.unsplash.com/photo-1525201548942-d8732f6617a0?w=600", "ref_1_notes": "Decision: ECU on hands during performance — the physical act of making the sound, not the performer's expression. Cut to this on technically complex passages. Forces the audience to hear differently.", "ref_2_moment": "Conversation \u2014 Mia speaking directly", "ref_2_shot": "Cam 2, MCU single", "ref_2_url": "https://images.unsplash.com/photo-1559523161-0fc0d8b38a7a?w=600", "ref_2_notes": "Decision: MCU held on subject, interviewer kept out of frame. Camera does not cut away when subject pauses — the silence is part of the answer. Reference: Conversations with Friends (BBC), interview scenes.", "ref_3_moment": "Two-shot during conversation", "ref_3_shot": "Cam 1, wide two-shot", "ref_3_url": "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600", "ref_3_notes": "Decision: wide two-shot with both subjects angled toward each other, not toward camera. Power is equal — neither is subordinated to the other's eyeline. Return to this after singles to reset the relationship.", "ref_4_moment": "Audience reaction \u2014 first song ending", "ref_4_shot": "Cam 3, handheld", "ref_4_url": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=600", "ref_4_notes": "Decision: handheld, rear of audience — camera operator finds the response, not directed. Soft focus on faces, performer lit in background. This camera is not called by the TD; it contributes colour only.", "ref_5_moment": "Second performance \u2014 hold on face", "ref_5_shot": "Cam 2, MCU Mia", "ref_5_url": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600", "ref_5_notes": "Decision: stay on face, do not cut to hands or audience. The conversation has changed what the performance means — the camera stays to register whether that is visible. Hold past the comfortable cut point."};
+const EXAMPLE_DATA = {"metaGroup": "Example Group", "metaMode": "Platform", "f_logline": "Dharawal hip-hop artist Mia Chen performs two songs and talks about making music that belongs to a specific place — for an audience of students who mostly consume music made somewhere else.", "f_authority": "Mia has been making music in the Wollongong scene for three years. Our group has been following her work and reached out directly. The authority is hers — we're providing the platform and the frame, not the content.", "f_collab_who": "Mia Chen — acoustic performer and songwriter, Wollongong. She's bringing her guitar and two original tracks.", "f_collab_brief": "Yes — briefed Tuesday. Mia knows: live stream to YouTube, 20 minutes total, acoustic performance plus conversation, we're not scripting the interview questions in advance, she can say no to anything.", "f_collab_confirmed": "true", "crew_fd": "Sam — briefs Mia before we go live, manages segment timing", "crew_td": "Jordan — on the switcher, we've agreed cut points in advance", "crew_c1": "Alex — wide shot covering full performance area", "crew_c2": "Priya — close on Mia during performance, two-shot during conversation", "crew_c3": "TBC from class — cutaways: hands on guitar, audience reactions", "crew_audio": "Lee — DI from guitar, lapel on Mia for conversation, check levels before live", "crew_other": "", "f_feel": "Intimate. Not a concert stage — a living room. We want the audience to feel like they've been let into a private performance, not watching from a distance.", "f_props": "Two stools. No backdrop — bare studio wall. A small rug under the performance area. Guitar stand. Water on a low table. Nothing decorative.", "f_positions": "Mia centred, slightly stage left. Host stage right on second stool. Stools angled 45° toward each other, both visible to cameras. No desk between them — physical openness is deliberate.", "f_audience": "Studio audience semicircle behind camera line — present but not in frame except for Cam 3 reaction shots. Their energy is part of the atmosphere.", "cam1_pos": "Camera left, slightly elevated, wide. Covers full performance area and both stools.", "cam1_shots": "Wide establishing shot. Full two-shot during conversation. Default return shot between cuts.", "cam1_moments": "Opening of each song. Start of conversation. Closing performance.", "cam1_notes": "Hold on wide at song openings — let the space read before cutting in.", "cam2_pos": "Camera right, close. Tight on Mia.", "cam2_shots": "MCU on Mia during performance. Singles during conversation. Hands on guitar.", "cam2_moments": "Any moment Mia makes a specific lyrical or musical choice worth highlighting. Key statements in conversation.", "cam2_notes": "Stay on Mia during the second performance — we want the close read after the conversation.", "cam3_pos": "Camera left rear, handheld or on shoulder. Audience side.", "cam3_shots": "Audience reactions. Over-shoulder cutaways. Creative angles during performance.", "cam3_moments": "First song ending. Any strong audience response. Anything unexpected.", "cam3_notes": "Not called live — TD pulls from these as colour. Operator has freedom to find what's alive.", "f_switcher": "Default rhythm: wide on song openings, cut to Cam 2 for close work after first verse. Conversation: hold singles longer than feels comfortable — let statements land. Return to wide when energy drops.", "audio_0_src": "Guitar (acoustic)", "audio_0_mic": "DI box from guitar output + room mic for natural sound", "audio_0_notes": "Test DI level before session. Natural reverb preferred — don't over-process.", "audio_1_src": "Mia (voice — performance)", "audio_1_mic": "Condenser overhead for singing — not a clip mic", "audio_1_notes": "Position before session. Risk: feedback from monitors — check gain before live.", "audio_2_src": "Both speakers (conversation)", "audio_2_mic": "Lavalier mics clipped before going live", "audio_2_notes": "Switch from overhead to lavs between performance and conversation. Cue: host stands to introduce conversation segment.", "audio_3_src": "", "audio_3_mic": "", "audio_3_notes": "", "f_assets": "Title card (static graphic): loaded in Mitti, TD calls at segment open. Outro music bed (original track, WAV file): loaded in Mitti, operator fades in at segment close. Note: streaming services and commercial recordings are subject to copyright law — automated enforcement can mute or interrupt the stream.", "audio_4_src": "Intro/outro music", "audio_4_mic": "WAV file via Mitti → audio board", "audio_4_notes": "Original or cleared track only — streaming services and commercial recordings are subject to copyright law — automated enforcement can mute or interrupt the stream. Cue: floor director signals 10 sec before segment close. Fade in slowly — don't cut over speech.", "audio_5_src": "", "audio_5_mic": "", "audio_5_notes": "", "f_script_runorder": "1. TD cuts to Cam 1 wide — host introduces segment (scripted, 30 sec).\n2. Host introduces Mia — Mia begins Song 1.\n3. Song 1 (~3 min). Cam 2 on performance throughout.\n4. Host pivots to conversation stool. Audio: switch to lavs.\n5. Conversation (~10 min). Singles + two-shot.\n6. Host re-introduces second performance (improvised, ~30 sec).\n7. Song 2 (~3 min). Cam 2 holds on face after conversation.\n8. Host closes segment to camera (scripted). Audio operator fades in music bed (original/cleared track) via Mitti.", "ref_0_moment": "Opening wide — Mia alone before introduction", "ref_0_shot": "Cam 1, wide, static", "ref_0_url": "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600", "ref_0_notes": "Decision: camera stays wide and static as performer enters — space reads before any cut. From NPR Tiny Desk: Robert Glasper, opening shot. Establishes the room as intimate, not a stage.", "ref_1_moment": "Performance — close on hands and guitar", "ref_1_shot": "Cam 2, ECU hands", "ref_1_url": "https://images.unsplash.com/photo-1525201548942-d8732f6617a0?w=600", "ref_1_notes": "Decision: ECU on hands during performance — the physical act of making the sound, not the performer's expression. Cut to this on technically complex passages. Forces the audience to hear differently.", "ref_2_moment": "Conversation — Mia speaking directly", "ref_2_shot": "Cam 2, MCU single", "ref_2_url": "https://images.unsplash.com/photo-1559523161-0fc0d8b38a7a?w=600", "ref_2_notes": "Decision: MCU held on subject, interviewer kept out of frame. Camera does not cut away when subject pauses — the silence is part of the answer. Reference: Conversations with Friends (BBC), interview scenes.", "ref_3_moment": "Two-shot during conversation", "ref_3_shot": "Cam 1, wide two-shot", "ref_3_url": "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600", "ref_3_notes": "Decision: wide two-shot with both subjects angled toward each other, not toward camera. Power is equal — neither is subordinated to the other's eyeline. Return to this after singles to reset the relationship.", "ref_4_moment": "Audience reaction — first song ending", "ref_4_shot": "Cam 3, handheld", "ref_4_url": "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=600", "ref_4_notes": "Decision: handheld, rear of audience — camera operator finds the response, not directed. Soft focus on faces, performer lit in background. This camera is not called by the TD; it contributes colour only.", "ref_5_moment": "Second performance — hold on face", "ref_5_shot": "Cam 2, MCU Mia", "ref_5_url": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600", "ref_5_notes": "Decision: stay on face, do not cut to hands or audience. The conversation has changed what the performance means — the camera stays to register whether that is visible. Hold past the comfortable cut point.", "f_charter": "Mia's practice is exactly the kind of diverse creative resource the Charter asks us to make use of — local, place-specific, not part of the mainstream. The segment contributes to the cultural life of the Wollongong music scene by giving her work an audience it wouldn't otherwise reach.", "metaTutorial": "Mon 9.30", "f_audience_p1": "Students at UOW and young people in Wollongong who make music or care about local creative culture — people who already know there's something happening here but haven't seen it on a screen before.", "f_purpose": "Mia is making music that belongs to this place and this community, but it has almost no visibility outside the venues she plays. There's a gap between what exists here culturally and what gets seen. This segment exists to close that gap, even briefly."};
 
-const IS_EXAMPLE = 3;
 
 function loadExampleExp() {
   // Fill all fields from example data
@@ -1994,9 +1964,8 @@ function cleanSubstitute() {
 
 // ── BLANK FORM PRINT ──────────────────────────────────────────
 const BLANK_HEIGHTS = {
-  f_logline: '52px', f_logline_delta: '36px',
-  f_segment: '88px', f_question: '60px',
-  f_authority: '80px', f_forabout: '80px', f_for: '60px', f_stakes: '80px',
+  f_logline: '52px',
+  f_authority: '80px', f_purpose: '60px', f_charter: '60px', f_audience_p1: '60px',
   f_collab_who: '56px', f_collab_brief: '80px',
   crew_fd: '28px', crew_td: '28px', crew_c1: '28px', crew_c2: '28px',
   crew_c3: '28px', crew_audio: '28px', crew_other: '28px',
@@ -2066,121 +2035,127 @@ document.addEventListener('click', e => {
 
 // ── GUIDED MODE ───────────────────────────────────────────────
 const GUIDED_STEPS = [
+  // ── META ──
+  { part: 'Getting started',
+    label: 'What is your group name?',
+    hint: 'Type it exactly as you entered it in the form — your data is saved under this name.',
+    id: 'metaGroup', type: 'textarea' },
+
+  { part: 'Getting started',
+    label: 'Which tutorial are you in?',
+    hint: 'Select your tutorial time.',
+    id: 'metaTutorial', type: 'select',
+    options: ['', 'Mon 9.30', 'Mon 13.30', 'Tue 9.30', 'Tue 12.30', 'Tue 14.30'] },
+
+  { part: 'Getting started',
+    label: 'What mode are you working in?',
+    hint: 'Platform, Performance, Participation, or Discourse. Not sure? Use the Mode guide button in the form.',
+    id: 'metaMode', type: 'select',
+    options: ['', 'Platform', 'Performance', 'Participation', 'Discourse'] },
+
+  { part: 'Getting started',
+    label: 'Which week is this?',
+    hint: 'Studio sessions are in Weeks 3, 5, and 7.',
+    id: 'metaWeek', type: 'textarea' },
+
   // ── PART 1 ──
   { part: 'Part 1 — The segment brief',
     label: 'What is your segment about?',
-    hint: 'Write one sentence. What actually happens, and why would someone who doesn\'t know you care? Struggle to write this? That means you haven\'t agreed what the segment is yet — that\'s the conversation to have now.',
+    hint: 'One sentence. What actually happens, and why would someone who doesn\'t know you care? If you can\'t write it clearly, you haven\'t agreed what the segment is yet.',
     id: 'f_logline', type: 'textarea' },
 
-  { part: 'Part 1 — The segment brief',
-    label: 'What\'s new about this version?',
-    hint: 'If this is your first experiment, write "First time." If you\'ve done this segment before, say what\'s different — one or two sentences.',
-    id: 'f_logline_delta', type: 'textarea' },
-
-  { part: 'Part 1 — The segment brief',
-    label: 'How does the segment run?',
-    hint: 'Beginning, middle, end — three sentences maximum. What happens first, what happens in the middle, how does it close?',
-    id: 'f_segment', type: 'textarea' },
-
-  { part: 'Part 1 — The segment brief',
-    label: 'What are you genuinely trying to find out?',
-    hint: 'Not "whether it works." A real question your experiment needs to answer — something you don\'t already know. Write it as a question.',
-    id: 'f_question', type: 'textarea' },
-
-  // Authority & Relationship
   { part: 'Part 1 — Authority & relationship',
-    label: 'Where does the right to make this come from?',
-    hint: 'Is the authority inside your group, or does it belong to someone outside the room? If it\'s outside — a community, a person, a practice — what\'s your relationship to it?',
+    label: 'Where does the authority to make this come from?',
+    hint: 'Is it inside your group, or does it belong to someone outside the room?',
     id: 'f_authority', type: 'textarea' },
 
-  { part: 'Part 1 — Authority & relationship',
-    label: 'Is this segment for someone, or about them?',
-    hint: 'Is there a real person or community outside this room who would recognise themselves in it? If yes — are you making it for them, or about them? What\'s the difference in your case?',
-    id: 'f_forabout', type: 'textarea' },
+  { part: 'Part 1 — Foundations',
+    label: 'Who in this community needs this to exist — and why?',
+    hint: 'This is the ecological function question. If you can\'t name a specific person, practice, or gap this serves, the segment may not need to exist yet.',
+    id: 'f_purpose', type: 'textarea' },
+
+
 
   { part: 'Part 1 — Authority & relationship',
-    label: 'Who are you making this for?',
-    hint: 'Name the audience. Local young people? Students in this room? The person you\'re featuring? Be specific.',
-    id: 'f_for', type: 'textarea' },
+    label: 'How does this respond to the Charter?',
+    hint: 'Does it draw on the creative and cultural life of this community — and how does it give something back?',
+    id: 'f_charter', type: 'textarea' },
 
   { part: 'Part 1 — Authority & relationship',
-    label: 'What changes by the end?',
-    hint: 'For the person featured, for the audience, for the room. What\'s actually at stake? If nothing changes, it\'s not a segment yet.',
-    id: 'f_stakes', type: 'textarea' },
+    label: 'Who would actually watch this — and why would they be engaged?',
+    hint: 'Name a specific audience, not a general one. What does this segment offer them that they couldn\'t get elsewhere?',
+    id: 'f_audience_p1', type: 'textarea' },
 
   // Platform
   { part: 'Part 1 — Platform mode (if applicable)',
     label: 'Who are you working with, and what are they bringing?',
-    hint: 'If your segment is Platform mode, name your collaborator and describe what they\'re contributing. If you\'re not using Platform mode for this experiment, leave this blank and move on.',
+    hint: 'If your segment is Platform mode, name your collaborator and describe what they\'re contributing. Otherwise leave blank.',
     id: 'f_collab_who', type: 'textarea' },
 
   { part: 'Part 1 — Platform mode (if applicable)',
     label: 'Have they been briefed?',
-    hint: 'Have you told them: it\'s a live stream, there\'ll be a studio crew, this is what you\'re asking of them? This conversation must happen before the studio session — not during it.',
+    hint: 'Have you told them: it\'s a live stream, there\'ll be a studio crew, this is what you\'re asking of them? This must happen before the studio session.',
     id: 'f_collab_brief', type: 'textarea' },
 
   // Crew
   { part: 'Part 1 — Crew',
     label: 'Who in your group is doing what?',
-    hint: 'Assign roles provisionally. You\'ll also have crew from the rest of the class — focus on who in your group takes each key role.',
+    hint: 'Assign roles provisionally. You\'ll also have crew from the rest of the class.',
     type: 'crew' },
 
   // ── PART 2 ──
   { part: 'Part 2 — Set & staging',
     label: 'What does the studio space need to feel like?',
-    hint: 'The studio is a blank room. Pick one word — intimate, exposed, formal, bare, casual — and justify it. What feeling are you trying to produce for the audience?',
+    hint: 'Pick one word — intimate, exposed, formal, bare, casual — and justify it.',
     id: 'f_feel', type: 'textarea' },
 
   { part: 'Part 2 — Set & staging',
     label: 'What do you need in the room?',
-    hint: 'List the physical things: furniture, objects, backdrop, props. Be specific — "two stools" not "seating." Nothing decorative unless it\'s doing something.',
+    hint: 'Furniture, objects, backdrop, props. Be specific.',
     id: 'f_props', type: 'textarea' },
 
   { part: 'Part 2 — Set & staging',
     label: 'Where do your performers or guests go?',
-    hint: 'Describe where people stand or sit relative to the cameras. Is the performer centred? Stage left? Angled toward the host? Movement needs to be planned, not improvised.',
+    hint: 'Describe positions and movement relative to the cameras.',
     id: 'f_positions', type: 'textarea' },
 
   { part: 'Part 2 — Set & staging',
     label: 'Where is the audience?',
-    hint: 'Where do they sit, and what role do they play in frame? In Participation mode, the audience is the content — this question and the one above reverse.',
+    hint: 'Where do they sit, and what role do they play in frame?',
     id: 'f_audience', type: 'textarea' },
 
-  // Camera — complex
   { part: 'Part 2 — Camera plan',
     label: 'Camera plan',
-    hint: 'Three cameras. Each one needs a position, a primary shot, the key moments it covers, and notes for the operator. This is best filled in the full form where you can see the table.',
+    hint: 'Three cameras, each needing a position, primary shot, key moments, and operator notes.',
     type: 'complex',
-    note: 'The camera plan has three rows — one per camera. Each needs: where it sits in the studio, what shot it\'s holding, which moments it covers, and notes for the operator. Tap "See full form" to fill this in.' },
+    note: 'The camera plan is a three-row table — best filled in the full form. Tap \'Open full form\' to fill it in.' },
 
   { part: 'Part 2 — Camera plan',
     label: 'Switcher notes',
-    hint: 'What\'s the default cut rhythm? Where do you need to hold longer than feels comfortable? Write this for the person operating the switcher.',
+    hint: 'What\'s the default cut rhythm? Where do you need to hold longer than feels comfortable?',
     id: 'f_switcher', type: 'textarea' },
 
-  // Audio — complex
   { part: 'Part 2 — Audio',
     label: 'Audio plan',
-    hint: 'List every sound source — voices, instruments, music beds — with how it\'s being picked up and any risks. This is best filled in the full form where you can see the table.',
+    hint: 'Every sound source — voices, instruments, music beds — with pickup method and risks.',
     type: 'complex',
-    note: 'The audio table has two sections: live sources (microphones, instruments in the room) and played-in sources (pre-recorded music or audio). For each source, you\'ll note the pickup method and any risks. Tap "See full form" to fill this in.' },
+    note: 'The audio table has two sections: live sources and played-in sources. Best filled in the full form. Tap "Open full form" to fill it in.' },
 
   { part: 'Part 2 — Audio',
     label: 'Recorded media and assets',
-    hint: 'Anything that isn\'t a live camera — title cards, lower-third name labels, graphic overlays, a music bed at the end. Who loads it, who calls it, when does it run?',
+    hint: 'Title cards, lower thirds, graphics, music beds. Who loads it, who calls it, when does it run?',
     id: 'f_assets', type: 'textarea' },
 
   { part: 'Part 2 — Running order',
     label: 'What happens, in sequence?',
-    hint: 'Number each beat. Write what\'s scripted and what\'s improvised, what triggers each transition, and what each key person is doing. Make it clear enough that any crew member can follow it without asking questions.',
+    hint: 'Number each beat. Scripted vs improvised, what triggers each transition, what each key person is doing.',
     id: 'f_script_runorder', type: 'textarea' },
 
-  // Key moments — complex
   { part: 'Part 2 — Key moments & borrowed looks',
     label: 'Key moments and reference images',
-    hint: 'For each key moment, find a still from an actual broadcast that shows a specific camera or staging decision you want to borrow. Not a mood — a decision. This is best filled in the full form.',
+    hint: 'For each key moment, find a still from an actual broadcast that shows a specific decision you want to borrow.',
     type: 'complex',
-    note: 'Find a screenshot from a real broadcast or show for each key moment — something that demonstrates a specific framing or staging decision. Paste the image URL in the full form and describe the decision in the notes field. Tap "See full form" to fill these in.' },
+    note: 'Six reference card slots — each needs a screenshot URL and notes. Best filled in the full form. Tap "Open full form" to fill them in.' },
 ];
 
 let guidedStep = 0;
@@ -2200,7 +2175,7 @@ function exitGuided() {
 
 function showExample() {
   exitGuided();
-  switchExp(IS_EXAMPLE);
+  showExampleView();
 }
 
 function guidedNav(dir) {
@@ -2213,7 +2188,7 @@ function guidedNav(dir) {
 
 function saveGuidedField() {
   const step = GUIDED_STEPS[guidedStep];
-  if (step.type === 'textarea' && step.id) {
+  if ((step.type === 'textarea' || step.type === 'select') && step.id) {
     const inp = document.getElementById('gp_input');
     const real = document.getElementById(step.id);
     if (inp && real) {
@@ -2303,7 +2278,7 @@ function renderGuidedStep() {
 // ── INIT ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   buildRefGrid();
-  loadExp(0);
+  loadExp();
   updateAllModeTabs();
   autoResizeAll();
   initInstrPanel();
